@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 FIFA World Cup Performance Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #022c22; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
+        .slide-deck { width: 1280px; }
+        .slide { width: 1280px; height: 720px; background: #064e3b; position: relative; overflow: hidden; display: flex; flex-direction: column; margin-bottom: 40px; border: 1px solid rgba(251, 191, 36, 0.1); padding: 40px; color: white; }
+        .card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; }
+        .table-name { font-size: 0.65rem; font-weight: 800; color: #fbbf24; text-transform: uppercase; }
+        .pk { color: #fca5a5; font-size: 0.5rem; font-family: monospace; }
+        .fk { color: #60a5fa; font-size: 0.5rem; font-family: monospace; }
+        .chart-bar { background: #fbbf24; height: 8px; border-radius: 2px; }
+        .badge { background: rgba(251, 191, 36, 0.15); border: 1px solid #fbbf24; color: #fbbf24; padding: 2px 8px; border-radius: 12px; font-size: 0.6rem; font-weight: 600; }
+        .insight-box { border-left: 3px solid #fbbf24; padding-left: 15px; }
+    </style>
+</head>
+<body class="p-5">
+    <div class="slide-deck">
+<div class="slide items-center justify-center text-center">
+            <h1 class="text-6xl font-bold mb-6">2026 FIFA World Cup Performance Analytics</h1>
+            <p class="text-xl text-emerald-100 mb-12">SQL-Based Analysis of Team and Player Performance Using a Normalized MySQL Database</p>
+            <div class="card p-8 w-full max-w-2xl text-left">
+                <h3 class="text-amber-400 font-bold uppercase text-xs mb-4 tracking-widest">Project Focus</h3>
+                <div class="grid grid-cols-2 gap-4 text-sm text-emerald-50">
+                    <p>• Designed a normalized relational database (3NF)</p>
+                    <p>• Built ETL pipelines for structured data</p>
+                    <p>• Performed SQL-based analytical queries</p>
+                    <p>• Generated performance insights for teams and players</p>
+                </div>
+            </div>
+            <div class="absolute bottom-10 right-10 text-right">
+                <p class="text-xs text-emerald-300">Prepared by</p>
+                <p class="font-bold text-lg">Srayani Ghosh</p>
+            </div>
+        </div>
+<div class="slide">
+            <h2 class="text-3xl font-bold mb-6">Database Architecture: Architectural Overview</h2>
+            <div class="grid grid-cols-2 gap-8 h-full">
+                <div class="space-y-3">
+                    <h3 class="text-emerald-300 font-bold text-xs uppercase tracking-widest">Team Analytical Domain</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="card p-2"><div class="table-name">teams</div><div class="pk">team_id (PK)</div></div>
+                        <div class="card p-2"><div class="table-name">team_attacking</div><div class="pk">team_id (PK)</div><div class="fk">team_id (FK)</div></div>
+                        <div class="card p-2"><div class="table-name">team_defending</div><div class="pk">team_id (PK)</div><div class="fk">team_id (FK)</div></div>
+                        <div class="card p-2"><div class="table-name">team_discipline</div><div class="pk">team_id (PK)</div><div class="fk">team_id (FK)</div></div>
+                        <div class="card p-2"><div class="table-name">team_distribution</div><div class="pk">team_id (PK)</div><div class="fk">team_id (FK)</div></div>
+                        <div class="card p-2"><div class="table-name">team_goalkeeping</div><div class="pk">team_id (PK)</div><div class="fk">team_id (FK)</div></div>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <h3 class="text-emerald-300 font-bold text-xs uppercase tracking-widest">Player Analytical Domain</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="card p-2"><div class="table-name">players</div><div class="pk">player_id (PK)</div></div>
+                        <div class="card p-2"><div class="table-name">player_attacking</div><div class="pk">p_id, t_id (PK)</div><div class="fk">p_id, t_id (FK)</div></div>
+                        <div class="card p-2"><div class="table-name">player_defending</div><div class="pk">p_id, t_id (PK)</div><div class="fk">p_id, t_id (FK)</div></div>
+                        <div class="card p-2"><div class="table-name">player_discipline</div><div class="pk">p_id, t_id (PK)</div><div class="fk">p_id, t_id (FK)</div></div>
+                        <div class="card p-2"><div class="table-name">player_distribution</div><div class="pk">p_id, t_id (PK)</div><div class="fk">p_id, t_id (FK)</div></div>
+                        <div class="card p-2"><div class="table-name">player_goalkeeping</div><div class="pk">p_id, t_id (PK)</div><div class="fk">p_id, t_id (FK)</div></div>
+                        <div class="card p-2"><div class="table-name">player_goalsbook</div><div class="pk">p_id, t_id (PK)</div><div class="fk">p_id, t_id (FK)</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+<div class="slide">
+            <h2 class="text-2xl font-bold mb-4">Tournament Snapshot</h2>
+            <div class="flex gap-4 mb-4">
+                <div class="card p-3 bg-emerald-900/30 flex-1"><div class="text-[0.6rem] text-emerald-300 uppercase">Participating Teams</div><div class="text-2xl font-bold">48</div></div>
+                <div class="card p-3 bg-emerald-900/30 flex-1"><div class="text-[0.6rem] text-emerald-300 uppercase">Registered Players</div><div class="text-2xl font-bold">1,242</div></div>
+                <div class="card p-3 flex-[2] flex items-center gap-3">
+                    <h3 class="text-amber-400 font-bold text-[0.6rem] uppercase tracking-wider">SQL Techniques</h3>
+                    <div class="flex flex-wrap gap-2"><span class="badge">COUNT()</span><span class="badge">INNER JOIN</span><span class="badge">ORDER BY</span><span class="badge">LIMIT</span><span class="badge">AGGREGATION</span><span class="badge">RANKING</span></div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-x-8 gap-y-4 text-[0.65rem] mb-6">
+                <div><div class="text-emerald-300 font-bold uppercase mb-2">Top Goal Scoring Teams</div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between"><span>Argentina</span><span>19</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>France</span><span>16</span></div><div class="chart-bar w-[84%]"></div>
+                        <div class="flex justify-between"><span>Belgium/Eng</span><span>14</span></div><div class="chart-bar w-[73%]"></div>
+                        <div class="flex justify-between"><span>Norway/Spain</span><span>13</span></div><div class="chart-bar w-[68%]"></div>
+                        <div class="flex justify-between"><span>Ger/Ned/USA</span><span>11</span></div><div class="chart-bar w-[57%]"></div>
+                    </div>
+                </div>
+                <div><div class="text-emerald-300 font-bold uppercase mb-2">Fewest Goals Conceded</div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between"><span>Colombia/Spain</span><span>1</span></div><div class="chart-bar w-[10%]"></div>
+                        <div class="flex justify-between"><span>Mex/Aus/Por/Kor/Iran/Gha</span><span>3</span></div><div class="chart-bar w-[30%]"></div>
+                        <div class="flex justify-between"><span>Brazil/Côte d'Ivoire</span><span>4</span></div><div class="chart-bar w-[40%]"></div>
+                    </div>
+                </div>
+                <div><div class="text-emerald-300 font-bold uppercase mb-2">Highest Passing Accuracy (%)</div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between"><span>Arg/Spa</span><span>91%</span></div><div class="chart-bar w-[91%]"></div>
+                        <div class="flex justify-between"><span>Alg/Bra/Por/Ger</span><span>90%</span></div><div class="chart-bar w-[90%]"></div>
+                        <div class="flex justify-between"><span>Kor/Eng/Fra</span><span>89%</span></div><div class="chart-bar w-[89%]"></div>
+                    </div>
+                </div>
+                <div><div class="text-emerald-300 font-bold uppercase mb-2">Highest Ball Possession (%)</div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between"><span>Spain/Türkiye</span><span>58%</span></div><div class="chart-bar w-[58%]"></div>
+                        <div class="flex justify-between"><span>Alg/Ger/Kor</span><span>56%</span></div><div class="chart-bar w-[56%]"></div>
+                        <div class="flex justify-between"><span>Argentina</span><span>55%</span></div><div class="chart-bar w-[55%]"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-4 mt-auto">
+                <h3 class="text-amber-400 font-bold uppercase text-[0.7rem] mb-2 tracking-widest">SQL Analytics – Key Findings</h3>
+                <ul class="text-emerald-50 text-[0.7rem] grid grid-cols-2 gap-x-6 gap-y-1 list-disc pl-4">
+                    <li>Argentina (19 goals) and Spain (defensive/possession balance) stand out as the most balanced elite sides.</li>
+                    <li>France led the tournament with 120 shots while maintaining high goal output.</li>
+                    <li>England (102 fouls) and Egypt (12 yellow cards) showed aggressive disciplinary profiles.</li>
+                    <li>Canada's 50 corners indicate sustained final-third pressure.</li>
+                </ul>
+            </div>
+        </div>
+<div class="slide">
+            <h2 class="text-2xl font-bold mb-4">Team Attacking Analysis</h2>
+            <div class="grid grid-cols-2 gap-x-6 gap-y-4 text-[0.6rem]">
+                <div><div class="text-emerald-300 font-bold uppercase mb-2">Top Goals Scored</div><div class="space-y-0.5">
+                    <div class="flex justify-between"><span>Argentina</span><span>19</span></div><div class="chart-bar w-[100%]"></div>
+                    <div class="flex justify-between"><span>France</span><span>16</span></div><div class="chart-bar w-[84%]"></div>
+                    <div class="flex justify-between"><span>Belgium</span><span>14</span></div><div class="chart-bar w-[73%]"></div>
+                    <div class="flex justify-between"><span>England</span><span>14</span></div><div class="chart-bar w-[73%]"></div>
+                    <div class="flex justify-between"><span>Norway</span><span>13</span></div><div class="chart-bar w-[68%]"></div>
+                </div></div>
+                <div><div class="text-emerald-300 font-bold uppercase mb-2">Most Shot Attempts</div><div class="space-y-0.5">
+                    <div class="flex justify-between"><span>France</span><span>120</span></div><div class="chart-bar w-[100%]"></div>
+                    <div class="flex justify-between"><span>Spain</span><span>120</span></div><div class="chart-bar w-[100%]"></div>
+                    <div class="flex justify-between"><span>Argentina</span><span>113</span></div><div class="chart-bar w-[94%]"></div>
+                    <div class="flex justify-between"><span>Belgium</span><span>112</span></div><div class="chart-bar w-[93%]"></div>
+                    <div class="flex justify-between"><span>England</span><span>99</span></div><div class="chart-bar w-[82%]"></div>
+                </div></div>
+                <div><div class="text-emerald-300 font-bold uppercase mb-2">Expected Goals (xG)</div><div class="space-y-0.5">
+                    <div class="flex justify-between"><span>Argentina</span><span>15.38</span></div><div class="chart-bar w-[100%]"></div>
+                    <div class="flex justify-between"><span>Spain</span><span>14.96</span></div><div class="chart-bar w-[97%]"></div>
+                    <div class="flex justify-between"><span>France</span><span>13.79</span></div><div class="chart-bar w-[89%]"></div>
+                    <div class="flex justify-between"><span>England</span><span>12.70</span></div><div class="chart-bar w-[82%]"></div>
+                    <div class="flex justify-between"><span>Brazil</span><span>10.88</span></div><div class="chart-bar w-[70%]"></div>
+                </div></div>
+                <div><div class="text-emerald-300 font-bold uppercase mb-2">Goals Above xG (Efficiency)</div><div class="space-y-0.5">
+                    <div class="flex justify-between"><span>Netherlands</span><span>6.00</span></div><div class="chart-bar w-[100%]"></div>
+                    <div class="flex justify-between"><span>Japan</span><span>4.83</span></div><div class="chart-bar w-[80%]"></div>
+                    <div class="flex justify-between"><span>USA</span><span>4.63</span></div><div class="chart-bar w-[77%]"></div>
+                    <div class="flex justify-between"><span>Argentina</span><span>3.62</span></div><div class="chart-bar w-[60%]"></div>
+                    <div class="flex justify-between"><span>Morocco</span><span>3.43</span></div><div class="chart-bar w-[57%]"></div>
+                </div></div>
+            </div>
+            <div class="mt-6 flex gap-4">
+                <div class="card p-3 flex-grow">
+                    <h3 class="text-amber-400 font-bold uppercase text-[0.65rem] mb-1">Key Findings</h3>
+                    <ul class="text-[0.6rem] text-emerald-50 list-disc pl-4 space-y-0.5">
+                        <li>Argentina led in scoring; France generated the most shots.</li>
+                        <li>Spain showed high xG with possession-based play.</li>
+                        <li>Netherlands and Japan displayed high finishing efficiency relative to xG.</li>
+                    </ul>
+                </div>
+                <div class="card p-3 w-64">
+                    <h3 class="text-amber-400 font-bold uppercase text-[0.65rem] mb-1">SQL Techniques Applied</h3>
+                    <div class="flex flex-wrap gap-1"><span class="badge">JOIN</span><span class="badge">ORDER BY</span><span class="badge">ROUND()</span><span class="badge">RANK</span></div>
+                    <p class="text-[0.5rem] italic text-emerald-200 mt-2">"xG analysis used (Goals − xG) for efficiency."</p>
+                </div>
+            </div>
+        </div>
+<div class="slide">
+            <h2 class="text-2xl font-bold mb-4">Team Defensive Analysis</h2>
+            <div class="grid grid-cols-2 gap-x-6 gap-y-4 text-[0.6rem]">
+                <div><div class="text-emerald-300 font-bold uppercase mb-2">Fewest Goals Conceded</div><div class="space-y-0.5">
+                    <div class="flex justify-between"><span>Colombia</span><span>1</span></div><div class="chart-bar w-[100%]"></div>
+                    <div class="flex justify-between"><span>Spain</span><span>1</span></div><div class="chart-bar w-[100%]"></div>
+                    <div class="flex justify-between"><span>Mexico</span><span>3</span></div><div class="chart-bar w-[90%]"></div>
+                    <div class="flex justify-between"><span>Australia</span><span>3</span></div><div class="chart-bar w-[90%]"></div>
+                    <div class="flex justify-between"><span>Portugal</span><span>3</span></div><div class="chart-bar w-[90%]"></div>
+                </div></div>
+                <div><div class="text-emerald-300 font-bold uppercase mb-2">Most Clean Sheets</div><div class="space-y-0.5">
+                    <div class="flex justify-between"><span>Spain</span><span>6</span></div><div class="chart-bar w-[100%]"></div>
+                    <div class="flex justify-between"><span>France</span><span>4</span></div><div class="chart-bar w-[66%]"></div>
+                    <div class="flex justify-between"><span>Colombia</span><span>4</span></div><div class="chart-bar w-[66%]"></div>
+                    <div class="flex justify-between"><span>Mexico</span><span>4</span></div><div class="chart-bar w-[66%]"></div>
+                    <div class="flex justify-between"><span>Brazil</span><span>2</span></div><div class="chart-bar w-[33%]"></div>
+                </div></div>
+                <div><div class="text-emerald-300 font-bold uppercase mb-2">Highest Defensive Pressures</div><div class="space-y-0.5">
+                    <div class="flex justify-between"><span>England</span><span>1708</span></div><div class="chart-bar w-[100%]"></div>
+                    <div class="flex justify-between"><span>Paraguay</span><span>1689</span></div><div class="chart-bar w-[98%]"></div>
+                    <div class="flex justify-between"><span>Spain</span><span>1641</span></div><div class="chart-bar w-[96%]"></div>
+                    <div class="flex justify-between"><span>France</span><span>1637</span></div><div class="chart-bar w-[95%]"></div>
+                    <div class="flex justify-between"><span>Argentina</span><span>1609</span></div><div class="chart-bar w-[94%]"></div>
+                </div></div>
+                <div><div class="text-emerald-300 font-bold uppercase mb-2">Forced Turnovers</div><div class="space-y-0.5">
+                    <div class="flex justify-between"><span>Spain</span><span>343</span></div><div class="chart-bar w-[100%]"></div>
+                    <div class="flex justify-between"><span>France</span><span>300</span></div><div class="chart-bar w-[87%]"></div>
+                    <div class="flex justify-between"><span>Argentina</span><span>297</span></div><div class="chart-bar w-[86%]"></div>
+                    <div class="flex justify-between"><span>Switzerland</span><span>285</span></div><div class="chart-bar w-[83%]"></div>
+                    <div class="flex justify-between"><span>Belgium</span><span>263</span></div><div class="chart-bar w-[76%]"></div>
+                </div></div>
+            </div>
+            <div class="mt-6 flex gap-4">
+                <div class="card p-3 flex-grow">
+                    <h3 class="text-amber-400 font-bold uppercase text-[0.65rem] mb-1">Defensive Insights</h3>
+                    <ul class="text-[0.6rem] text-emerald-50 list-disc pl-4 space-y-0.5">
+                        <li>Spain recorded the strongest overall performance across all categories.</li>
+                        <li>England led defensive pressures (1,708), indicating high-intensity pressing.</li>
+                        <li>Colombia demonstrated remarkable efficiency, conceding only 1 goal.</li>
+                    </ul>
+                </div>
+                <div class="card p-3 w-64">
+                    <h3 class="text-amber-400 font-bold uppercase text-[0.65rem] mb-1">SQL Techniques Applied</h3>
+                    <div class="flex flex-wrap gap-1"><span class="badge">INNER JOIN</span><span class="badge">ORDER BY</span><span class="badge">LIMIT</span><span class="badge">RANK</span></div>
+                    <p class="text-[0.5rem] italic text-emerald-200 mt-2">"Defensive data integrates Team Defending and Goalkeeping tables."</p>
+                </div>
+            </div>
+        </div>
+<div class="slide">
+            <h2 class="text-2xl font-bold mb-1">Ball Possession & Distribution Analysis</h2>
+            <p class="text-emerald-200 text-xs mb-4">Evaluating possession control, passing efficiency, and ball progression using SQL.</p>
+            <div class="grid grid-cols-4 gap-3 flex-grow mb-4">
+                <div class="card p-2"><div class="text-emerald-300 font-bold uppercase text-[0.45rem] mb-2">Most Passes Completed</div>
+                    <div class="space-y-[2px] text-[0.4rem]">
+                        <div class="flex justify-between"><span>Argentina</span><span>4324</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>Spain</span><span>4156</span></div><div class="chart-bar w-[96%]"></div>
+                        <div class="flex justify-between"><span>France</span><span>3452</span></div><div class="chart-bar w-[80%]"></div>
+                        <div class="flex justify-between"><span>Morocco</span><span>3240</span></div><div class="chart-bar w-[75%]"></div>
+                        <div class="flex justify-between"><span>England</span><span>3098</span></div><div class="chart-bar w-[71%]"></div>
+                        <div class="flex justify-between"><span>Switzerland</span><span>2798</span></div><div class="chart-bar w-[65%]"></div>
+                        <div class="flex justify-between"><span>Norway</span><span>2727</span></div><div class="chart-bar w-[63%]"></div>
+                        <div class="flex justify-between"><span>Portugal</span><span>2654</span></div><div class="chart-bar w-[61%]"></div>
+                        <div class="flex justify-between"><span>Belgium</span><span>2653</span></div><div class="chart-bar w-[61%]"></div>
+                        <div class="flex justify-between"><span>Brazil</span><span>2462</span></div><div class="chart-bar w-[57%]"></div>
+                    </div>
+                </div>
+                <div class="card p-2"><div class="text-emerald-300 font-bold uppercase text-[0.45rem] mb-2">Highest Passing Accuracy (%)</div>
+                    <div class="space-y-[2px] text-[0.4rem]">
+                        <div class="flex justify-between"><span>Argentina</span><span>91%</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>Spain</span><span>91%</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>Algeria</span><span>90%</span></div><div class="chart-bar w-[99%]"></div>
+                        <div class="flex justify-between"><span>Brazil</span><span>90%</span></div><div class="chart-bar w-[99%]"></div>
+                        <div class="flex justify-between"><span>Portugal</span><span>90%</span></div><div class="chart-bar w-[99%]"></div>
+                        <div class="flex justify-between"><span>Germany</span><span>90%</span></div><div class="chart-bar w-[99%]"></div>
+                        <div class="flex justify-between"><span>Korea Rep.</span><span>89%</span></div><div class="chart-bar w-[98%]"></div>
+                        <div class="flex justify-between"><span>England</span><span>89%</span></div><div class="chart-bar w-[98%]"></div>
+                        <div class="flex justify-between"><span>France</span><span>89%</span></div><div class="chart-bar w-[98%]"></div>
+                        <div class="flex justify-between"><span>Senegal</span><span>88%</span></div><div class="chart-bar w-[97%]"></div>
+                    </div>
+                </div>
+                <div class="card p-2"><div class="text-emerald-300 font-bold uppercase text-[0.45rem] mb-2">Defensive Line-Breaking Passes</div>
+                    <div class="space-y-[2px] text-[0.4rem]">
+                        <div class="flex justify-between"><span>England</span><span>182</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>Spain</span><span>175</span></div><div class="chart-bar w-[96%]"></div>
+                        <div class="flex justify-between"><span>Switzerland</span><span>152</span></div><div class="chart-bar w-[83%]"></div>
+                        <div class="flex justify-between"><span>France</span><span>151</span></div><div class="chart-bar w-[82%]"></div>
+                        <div class="flex justify-between"><span>USA</span><span>140</span></div><div class="chart-bar w-[76%]"></div>
+                        <div class="flex justify-between"><span>Belgium</span><span>138</span></div><div class="chart-bar w-[75%]"></div>
+                        <div class="flex justify-between"><span>Portugal</span><span>123</span></div><div class="chart-bar w-[67%]"></div>
+                        <div class="flex justify-between"><span>Argentina</span><span>122</span></div><div class="chart-bar w-[67%]"></div>
+                        <div class="flex justify-between"><span>Canada</span><span>119</span></div><div class="chart-bar w-[65%]"></div>
+                        <div class="flex justify-between"><span>Egypt</span><span>112</span></div><div class="chart-bar w-[61%]"></div>
+                    </div>
+                </div>
+                <div class="card p-2"><div class="text-emerald-300 font-bold uppercase text-[0.45rem] mb-2">Most Crosses Attempted</div>
+                    <div class="space-y-[2px] text-[0.4rem]">
+                        <div class="flex justify-between"><span>England</span><span>162</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>Canada</span><span>158</span></div><div class="chart-bar w-[97%]"></div>
+                        <div class="flex justify-between"><span>Spain</span><span>154</span></div><div class="chart-bar w-[95%]"></div>
+                        <div class="flex justify-between"><span>Belgium</span><span>133</span></div><div class="chart-bar w-[82%]"></div>
+                        <div class="flex justify-between"><span>Switzerland</span><span>122</span></div><div class="chart-bar w-[75%]"></div>
+                        <div class="flex justify-between"><span>France</span><span>121</span></div><div class="chart-bar w-[74%]"></div>
+                        <div class="flex justify-between"><span>Germany</span><span>108</span></div><div class="chart-bar w-[66%]"></div>
+                        <div class="flex justify-between"><span>Argentina</span><span>102</span></div><div class="chart-bar w-[62%]"></div>
+                        <div class="flex justify-between"><span>Morocco</span><span>99</span></div><div class="chart-bar w-[61%]"></div>
+                        <div class="flex justify-between"><span>Portugal</span><span>94</span></div><div class="chart-bar w-[58%]"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="card p-3"><h3 class="text-amber-400 font-bold uppercase text-[0.6rem] mb-1">Distribution Insights</h3>
+                    <ul class="text-emerald-50 text-[0.55rem] list-disc pl-3 space-y-0.5">
+                        <li>Argentina and Spain demonstrated the strongest possession-based approach, leading the tournament in both completed passes and accuracy (91%).</li>
+                        <li>France and England combined high passing volumes with aggressive forward progression.</li>
+                        <li>England attempted the highest number of crosses (162) and defensive line-breaking passes (182), indicating a direct attacking style.</li>
+                        <li>Spain maintained a balanced profile, bridging elite passing accuracy with high-volume, progressive advancement.</li>
+                        <li>Belgium and Portugal consistently ranked among the top teams, demonstrating well-rounded ball progression.</li>
+                    </ul>
+                </div>
+                <div class="card p-3"><h3 class="text-amber-400 font-bold uppercase text-[0.6rem] mb-1">SQL Techniques Applied</h3>
+                    <div class="flex flex-wrap gap-1 mb-2"><span class="badge">INNER JOIN</span><span class="badge">ORDER BY</span><span class="badge">LIMIT</span><span class="badge">Ranking</span><span class="badge">Multi-table Analysis</span><span class="badge">Comparative Metrics</span></div>
+                    <p class="text-[0.55rem] text-emerald-200 italic">"SQL joins and ranking queries were used to evaluate possession quality, passing efficiency, crossing effectiveness, and progressive ball distribution across all participating teams."</p>
+                </div>
+            </div>
+        </div>
+<div class="slide">
+            <h2 class="text-2xl font-bold mb-1">Player Performance Analysis</h2>
+            <p class="text-emerald-200 text-xs mb-4">Evaluating attacking contribution, creativity, efficiency, and distribution using SQL.</p>
+            <div class="grid grid-cols-4 gap-3 flex-grow mb-4">
+                <div class="card p-2"><div class="text-emerald-300 font-bold uppercase text-[0.45rem] mb-2">Top Goal Contributors</div>
+                    <div class="space-y-[2px] text-[0.4rem]">
+                        <div class="flex justify-between"><span>L. Messi</span><span>12</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>K. Mbappe</span><span>11</span></div><div class="chart-bar w-[92%]"></div>
+                        <div class="flex justify-between"><span>H. Kane</span><span>7</span></div><div class="chart-bar w-[58%]"></div>
+                        <div class="flex justify-between"><span>J. Bellingham</span><span>7</span></div><div class="chart-bar w-[58%]"></div>
+                        <div class="flex justify-between"><span>O. Dembele</span><span>7</span></div><div class="chart-bar w-[58%]"></div>
+                        <div class="flex justify-between"><span>M. Oyarzabal</span><span>6</span></div><div class="chart-bar w-[50%]"></div>
+                    </div>
+                </div>
+                <div class="card p-2"><div class="text-emerald-300 font-bold uppercase text-[0.45rem] mb-2">Top Goal Scorers</div>
+                    <div class="space-y-[2px] text-[0.4rem]">
+                        <div class="flex justify-between"><span>K. Mbappe</span><span>8</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>L. Messi</span><span>8</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>E. Haaland</span><span>7</span></div><div class="chart-bar w-[87%]"></div>
+                        <div class="flex justify-between"><span>H. Kane</span><span>6</span></div><div class="chart-bar w-[75%]"></div>
+                        <div class="flex justify-between"><span>J. Bellingham</span><span>6</span></div><div class="chart-bar w-[75%]"></div>
+                        <div class="flex justify-between"><span>M. Oyarzabal</span><span>5</span></div><div class="chart-bar w-[62%]"></div>
+                        <div class="flex justify-between"><span>O. Dembele</span><span>5</span></div><div class="chart-bar w-[62%]"></div>
+                    </div>
+                </div>
+                <div class="card p-2"><div class="text-emerald-300 font-bold uppercase text-[0.45rem] mb-2">Highest xG</div>
+                    <div class="space-y-[2px] text-[0.4rem]">
+                        <div class="flex justify-between"><span>L. Messi</span><span>6.16</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>K. Mbappe</span><span>5.37</span></div><div class="chart-bar w-[87%]"></div>
+                        <div class="flex justify-between"><span>M. Oyarzabal</span><span>4.29</span></div><div class="chart-bar w-[70%]"></div>
+                        <div class="flex justify-between"><span>H. Kane</span><span>3.69</span></div><div class="chart-bar w-[60%]"></div>
+                        <div class="flex justify-between"><span>I. Sarr</span><span>3.68</span></div><div class="chart-bar w-[60%]"></div>
+                        <div class="flex justify-between"><span>J. Bellingham</span><span>3.36</span></div><div class="chart-bar w-[54%]"></div>
+                    </div>
+                </div>
+                <div class="card p-2"><div class="text-emerald-300 font-bold uppercase text-[0.45rem] mb-2">Most Passes Completed</div>
+                    <div class="space-y-[2px] text-[0.4rem]">
+                        <div class="flex justify-between"><span>Rodri</span><span>648</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>P. Cubarsi</span><span>547</span></div><div class="chart-bar w-[84%]"></div>
+                        <div class="flex justify-between"><span>A. Laporte</span><span>533</span></div><div class="chart-bar w-[82%]"></div>
+                        <div class="flex justify-between"><span>L. Paredes</span><span>496</span></div><div class="chart-bar w-[76%]"></div>
+                        <div class="flex justify-between"><span>E. Fernandez</span><span>448</span></div><div class="chart-bar w-[69%]"></div>
+                        <div class="flex justify-between"><span>G. Magalhaes</span><span>413</span></div><div class="chart-bar w-[64%]"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="card p-3"><h3 class="text-amber-400 font-bold uppercase text-[0.6rem] mb-1">Player Insights</h3>
+                    <ul class="text-emerald-50 text-[0.55rem] list-disc pl-3 space-y-0.5">
+                        <li>L. Messi led with 12 goal contributions, top xG (6.16), and most shots taken.</li>
+                        <li>K. Mbappe matched Messi's 8 goals, demonstrating elite finishing consistency.</li>
+                        <li>England's attack is balanced, with Kane and Bellingham contributing 7 each.</li>
+                        <li>M. Olise excelled as the primary creator with 5 assists during the tournament.</li>
+                        <li>Rodri anchored midfield distribution with 648 passes, dictating tempo for Spain.</li>
+                    </ul>
+                </div>
+                <div class="card p-3"><h3 class="text-amber-400 font-bold uppercase text-[0.6rem] mb-1">SQL Techniques Applied</h3>
+                    <div class="flex flex-wrap gap-1 mb-2"><span class="badge">INNER JOIN</span><span class="badge">Multi-table JOIN</span><span class="badge">ORDER BY</span><span class="badge">LIMIT</span><span class="badge">Derived Metrics</span><span class="badge">Comparative Ranking</span></div>
+                    <p class="text-[0.55rem] text-emerald-200 italic">"Player analysis integrates data from Players, Player Goalsbook, Player Attacking, Player Distribution, and Teams tables using SQL joins to evaluate multiple dimensions of individual performance."</p>
+                </div>
+            </div>
+        </div>
+<div class="slide">
+            <h2 class="text-2xl font-bold mb-1">Player Discipline & Defensive Behaviour Analysis</h2>
+            <div class="grid grid-cols-4 gap-3 flex-grow mb-4">
+                <div class="card p-2"><div class="text-emerald-300 font-bold uppercase text-[0.45rem] mb-2">Top Players Committing Fouls</div>
+                    <div class="space-y-[2px] text-[0.4rem]">
+                        <div class="flex justify-between"><span>J. Doku</span><span>18</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>A. Hakimi</span><span>16</span></div><div class="chart-bar w-[89%]"></div>
+                        <div class="flex justify-between"><span>D. Ndoye</span><span>16</span></div><div class="chart-bar w-[89%]"></div>
+                        <div class="flex justify-between"><span>J. Bellingham</span><span>16</span></div><div class="chart-bar w-[89%]"></div>
+                        <div class="flex justify-between"><span>L. Messi</span><span>16</span></div><div class="chart-bar w-[89%]"></div>
+                        <div class="flex justify-between"><span>M. Olise</span><span>16</span></div><div class="chart-bar w-[89%]"></div>
+                    </div>
+                </div>
+                <div class="card p-2"><div class="text-emerald-300 font-bold uppercase text-[0.45rem] mb-2">Most Fouled Players</div>
+                    <div class="space-y-[2px] text-[0.4rem]">
+                        <div class="flex justify-between"><span>N. El Aynaoui</span><span>15</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>A. Cubas</span><span>14</span></div><div class="chart-bar w-[93%]"></div>
+                        <div class="flex justify-between"><span>A. Pavlovic</span><span>13</span></div><div class="chart-bar w-[87%]"></div>
+                        <div class="flex justify-between"><span>L. Yamal</span><span>12</span></div><div class="chart-bar w-[80%]"></div>
+                        <div class="flex justify-between"><span>N. Raskin</span><span>12</span></div><div class="chart-bar w-[80%]"></div>
+                    </div>
+                </div>
+                <div class="card p-2"><div class="text-emerald-300 font-bold uppercase text-[0.45rem] mb-2">Yellow Cards</div>
+                    <div class="space-y-[2px] text-[0.4rem]">
+                        <div class="flex justify-between"><span>I. Diop</span><span>3</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>Others</span><span>2</span></div><div class="chart-bar w-[66%]"></div>
+                    </div>
+                </div>
+                <div class="card p-2"><div class="text-emerald-300 font-bold uppercase text-[0.45rem] mb-2">Most Frequently Offside</div>
+                    <div class="space-y-[2px] text-[0.4rem]">
+                        <div class="flex justify-between"><span>L. Diaz</span><span>9</span></div><div class="chart-bar w-[100%]"></div>
+                        <div class="flex justify-between"><span>L. Yamal</span><span>7</span></div><div class="chart-bar w-[77%]"></div>
+                        <div class="flex justify-between"><span>C. Ronaldo</span><span>6</span></div><div class="chart-bar w-[66%]"></div>
+                        <div class="flex justify-between"><span>M. Araujo</span><span>6</span></div><div class="chart-bar w-[66%]"></div>
+                        <div class="flex justify-between"><span>A. Isak</span><span>5</span></div><div class="chart-bar w-[55%]"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="card p-3"><h3 class="text-amber-400 font-bold uppercase text-[0.6rem] mb-1">Player Insights</h3>
+                    <ul class="text-emerald-50 text-[0.55rem] list-disc pl-3 space-y-0.5">
+                        <li><strong>Aggressive Play:</strong> J. Doku led fouls (18), signaling high-intensity pressing roles.</li>
+                        <li><strong>Targeting:</strong> N. El Aynaoui (15) was the most fouled, reflecting his danger as an attacking pivot.</li>
+                        <li><strong>Discipline:</strong> Generally disciplined; I. Diop (3) was the only outlier, with most players under 2 yellows.</li>
+                        <li><strong>Controlled Aggression:</strong> Players like Oyarzabal, El Aynaoui, and Rodri showed that high defensive volume doesn't require high foul counts.</li>
+                    </ul>
+                </div>
+                <div class="card p-3"><h3 class="text-amber-400 font-bold uppercase text-[0.6rem] mb-1">SQL Analytics Used</h3>
+                    <div class="flex flex-wrap gap-1 mb-2"><span class="badge">JOIN</span><span class="badge">ORDER BY</span><span class="badge">LIMIT</span><span class="badge">WHERE</span><span class="badge">RANKING</span></div>
+                    <p class="text-[0.55rem] text-emerald-200 italic">"SQL joins integrated Discipline and Defending tables to identify players who successfully balanced turnover recovery with discipline."</p>
+                </div>
+            </div>
+            <div class="mt-2 text-[0.55rem] text-emerald-300 italic text-center font-bold">Key Takeaway: Effective defending is defined not only by aggression but by maintaining discipline.</div>
+        </div>
+<div class="slide">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 class="text-2xl font-bold">Goalkeeping Performance & Defensive Impact</h2>
+                    <p class="text-emerald-200 text-sm italic">Evaluating shot-stopping, penalty-area command, and team-level defensive coordination.</p>
+                </div>
+                <div class="px-3 py-1 border border-emerald-500 rounded text-[0.6rem] uppercase tracking-wider text-emerald-300 bg-emerald-900/50">
+                    Integrated Analysis: Player + Team Goalkeeping
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 flex-grow">
+                <!-- Left: 4 Visualizations -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="card p-3"><div class="text-emerald-300 font-bold uppercase text-[0.5rem] mb-2">Top Goalkeepers by Saves</div>
+                        <div class="space-y-1 text-[0.45rem]">
+                            <div class="flex justify-between"><span>Orlando Gill</span><span>28</span></div><div class="chart-bar w-[100%]"></div>
+                            <div class="flex justify-between"><span>Eloy Room</span><span>21</span></div><div class="chart-bar w-[75%]"></div>
+                            <div class="flex justify-between"><span>Diogo Costa</span><span>20</span></div><div class="chart-bar w-[71%]"></div>
+                            <div class="flex justify-between"><span>Gregor Kobel</span><span>20</span></div><div class="chart-bar w-[71%]"></div>
+                            <div class="flex justify-between"><span>Jordan Pickford</span><span>19</span></div><div class="chart-bar w-[67%]"></div>
+                            <div class="flex justify-between"><span>Yassine Bounou</span><span>19</span></div><div class="chart-bar w-[67%]"></div>
+                            <div class="flex justify-between"><span>Vozinha</span><span>18</span></div><div class="chart-bar w-[64%]"></div>
+                            <div class="flex justify-between"><span>Bart Verbruggen</span><span>17</span></div><div class="chart-bar w-[60%]"></div>
+                        </div>
+                    </div>
+                    <div class="card p-3"><div class="text-emerald-300 font-bold uppercase text-[0.5rem] mb-2">Actions Inside Penalty Area</div>
+                        <div class="space-y-1 text-[0.45rem]">
+                            <div class="flex justify-between"><span>Orlando Gill</span><span>141</span></div><div class="chart-bar w-[100%]"></div>
+                            <div class="flex justify-between"><span>Vozinha</span><span>136</span></div><div class="chart-bar w-[96%]"></div>
+                            <div class="flex justify-between"><span>Jordan Pickford</span><span>133</span></div><div class="chart-bar w-[94%]"></div>
+                            <div class="flex justify-between"><span>Mahmoud Abunada</span><span>124</span></div><div class="chart-bar w-[87%]"></div>
+                            <div class="flex justify-between"><span>Mostafa Shoubir</span><span>119</span></div><div class="chart-bar w-[84%]"></div>
+                            <div class="flex justify-between"><span>Diogo Costa</span><span>114</span></div><div class="chart-bar w-[80%]"></div>
+                            <div class="flex justify-between"><span>Yassine Bounou</span><span>112</span></div><div class="chart-bar w-[79%]"></div>
+                            <div class="flex justify-between"><span>Thibaut Courtois</span><span>110</span></div><div class="chart-bar w-[78%]"></div>
+                        </div>
+                    </div>
+                    <div class="card p-3"><div class="text-emerald-300 font-bold uppercase text-[0.5rem] mb-2">Actions Outside Penalty Area</div>
+                        <div class="space-y-1 text-[0.45rem]">
+                            <div class="flex justify-between"><span>Orlando Gill</span><span>124</span></div><div class="chart-bar w-[100%]"></div>
+                            <div class="flex justify-between"><span>Jordan Pickford</span><span>110</span></div><div class="chart-bar w-[88%]"></div>
+                            <div class="flex justify-between"><span>Mostafa Shoubir</span><span>105</span></div><div class="chart-bar w-[84%]"></div>
+                            <div class="flex justify-between"><span>Mahmoud Abunada</span><span>103</span></div><div class="chart-bar w-[83%]"></div>
+                            <div class="flex justify-between"><span>Vozinha</span><span>102</span></div><div class="chart-bar w-[82%]"></div>
+                            <div class="flex justify-between"><span>Diogo Costa</span><span>93</span></div><div class="chart-bar w-[75%]"></div>
+                            <div class="flex justify-between"><span>Orjan Nyland</span><span>93</span></div><div class="chart-bar w-[75%]"></div>
+                            <div class="flex justify-between"><span>Yassine Bounou</span><span>91</span></div><div class="chart-bar w-[73%]"></div>
+                        </div>
+                    </div>
+                    <div class="card p-3">
+                        <div class="text-emerald-300 font-bold uppercase text-[0.5rem] mb-2">Defensive Profile: Saves vs Clean Sheets</div>
+                        <div class="h-20 w-full flex items-center justify-center border-t border-dashed border-emerald-800/50 mt-1">
+                             <div class="text-[0.5rem] text-emerald-500 italic">Scatter visualization: High clean sheets (Spain) vs High saves (Paraguay).</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Insights + SQL -->
+                <div class="flex flex-col gap-4">
+                    <div class="card p-4 flex-grow">
+                        <h3 class="text-amber-400 font-bold uppercase text-[0.6rem] mb-2">Key Insights</h3>
+                        <ul class="text-emerald-50 text-[0.55rem] space-y-1.5 list-disc pl-4">
+                            <li><strong>Workload:</strong> Orlando Gill (28 saves) faced the highest volume of shots, highlighting his impact.</li>
+                            <li><strong>Penalty Area Command:</strong> Proactive handling by Gill, Vozinha, and Pickford defined defensive stability.</li>
+                            <li><strong>Sweeper-Keeper Role:</strong> Aggressive positioning outside the box allowed keepers to act as extra defenders.</li>
+                            <li><strong>Defensive Strategy:</strong> Spain reached 6 clean sheets via organized team play (minimal saves), while Paraguay's success relied on high-volume shot-stopping.</li>
+                        </ul>
+                    </div>
+                    <div class="card p-4">
+                        <h3 class="text-amber-400 font-bold uppercase text-[0.6rem] mb-2">SQL Analytics Applied</h3>
+                        <div class="flex flex-wrap gap-1.5 mb-2">
+                            <span class="badge">INNER JOIN</span><span class="badge">ORDER BY</span><span class="badge">LIMIT</span><span class="badge">Comparative Analysis</span>
+                        </div>
+                        <p class="text-[0.55rem] text-emerald-200 italic">"Joins connected Players, Team Goalkeeping, and Defensive tables to map individual workload against collective team clean sheets."</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 text-[0.55rem] text-emerald-300 italic font-bold border-t border-emerald-800/50 pt-2 text-center">
+                Key Takeaway: Effective goalkeeping balances individual shot-stopping excellence with proactive command of the penalty area and support for the team defensive structure.
+            </div>
+        </div>
+<div class="slide">
+            <h2 class="text-3xl font-bold mb-8">Overall Tournament Insights (Part I)</h2>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="card p-5">
+                    <h3 class="text-amber-400 font-bold uppercase text-sm mb-3">1. Argentina: Most Complete Attack</h3>
+                    <ul class="text-xs text-emerald-50 space-y-1 list-disc pl-4 mb-3">
+                        <li>19 Goals; 15.38 xG; 4324 Passes (Highest).</li>
+                        <li>Joint-highest passing accuracy (91%).</li>
+                        <li>Messi led with 12 goal contributions.</li>
+                        <li>SQL: Joined team/player attacking and distribution tables.</li>
+                    </ul>
+                </div>
+                <div class="card p-5">
+                    <h3 class="text-amber-400 font-bold uppercase text-sm mb-3">2. Spain: Possession & Control</h3>
+                    <ul class="text-xs text-emerald-50 space-y-1 list-disc pl-4 mb-3">
+                        <li>6 Clean Sheets; only 1 goal conceded.</li>
+                        <li>58% Possession; high forced turnovers.</li>
+                        <li>SQL: Integrated team defensive and distribution metrics.</li>
+                    </ul>
+                </div>
+                <div class="card p-5">
+                    <h3 class="text-amber-400 font-bold uppercase text-sm mb-3">3. France: Attacking Pressure</h3>
+                    <ul class="text-xs text-emerald-50 space-y-1 list-disc pl-4 mb-3">
+                        <li>120 Total Shots; 50 shots on target.</li>
+                        <li>16 Goals; 13.79 xG.</li>
+                        <li>Insight: Shot volume correlates directly with attacking success.</li>
+                    </ul>
+                </div>
+                <div class="card p-5">
+                    <h3 class="text-amber-400 font-bold uppercase text-sm mb-3">4. Efficiency vs. Creation</h3>
+                    <ul class="text-xs text-emerald-50 space-y-1 list-disc pl-4 mb-3">
+                        <li>Finishing outliers: Netherlands (+6.00 xG), Japan (+4.83), USA (+4.63).</li>
+                        <li>SQL: Calculated (Goals − xG) for efficiency ratings.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+<div class="slide">
+            <h2 class="text-3xl font-bold mb-8">Overall Tournament Insights (Part II)</h2>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="card p-5">
+                    <h3 class="text-amber-400 font-bold uppercase text-sm mb-3">5. Possession & Success</h3>
+                    <p class="text-xs text-emerald-50 mb-2">Elite teams (Argentina, Spain, France) consistently led in passing, accuracy, and line-breaking passes, translating ball control into opportunities.</p>
+                </div>
+                <div class="card p-5">
+                    <h3 class="text-amber-400 font-bold uppercase text-sm mb-3">6. Defensive Philosophies</h3>
+                    <p class="text-xs text-emerald-50 mb-2">Spain: Prevented chances (1 goal conceded, high pressure). Paraguay: Survived them (Highest saves). SQL distinguishes proactive vs reactive play.</p>
+                </div>
+                <div class="card p-5">
+                    <h3 class="text-amber-400 font-bold uppercase text-sm mb-3">7. Star Player Impact</h3>
+                    <p class="text-xs text-emerald-50 mb-2">Messi, Mbappe, Kane, Bellingham, and Haaland dominated across all metrics (xG, Assists, Goals), proving multi-metric evaluation is essential.</p>
+                </div>
+                <div class="card p-5">
+                    <h3 class="text-amber-400 font-bold uppercase text-sm mb-3">8. Discipline Independence</h3>
+                    <p class="text-xs text-emerald-50 mb-2">Aggression (fouls/cards) did not negatively correlate with attacking success. High-pressing stars like Messi and Bellingham remained top performers.</p>
+                </div>
+            </div>
+            <div class="mt-8 text-center text-emerald-300 italic text-sm">
+                Key Takeaway: Relational database analysis enables a nuanced understanding of tactical trade-offs, defensive efficiency, and individual star influence.
+            </div>
+        </div>
+<div class="slide">
+            <h2 class="text-4xl font-bold mb-10 text-amber-400">How SQL Enabled Football Performance Analytics</h2>
+            <div class="grid grid-cols-2 gap-8">
+                <div class="card space-y-4">
+                    <h3 class="text-emerald-300 font-bold uppercase text-xs tracking-widest mb-4">SQL Capabilities Demonstrated</h3>
+                    <ul class="text-emerald-50 text-sm space-y-3 list-disc pl-4">
+                        <li>Database normalization into multiple relational tables.</li>
+                        <li>Foreign-key joins linking players, teams, and performance statistics.</li>
+                        <li>Aggregate functions (COUNT, SUM, AVG) for tournament summaries.</li>
+                        <li>Ranking using ORDER BY and LIMIT.</li>
+                    </ul>
+                </div>
+                <div class="card space-y-4">
+                    <h3 class="text-emerald-300 font-bold uppercase text-xs tracking-widest mb-4">Derived Metrics & Analytics</h3>
+                    <ul class="text-emerald-50 text-sm space-y-3 list-disc pl-4">
+                        <li><strong>Goal Contributions:</strong> (Goals + Assists).</li>
+                        <li><strong>Efficiency:</strong> (Goals − xG).</li>
+                        <li>Multi-table analytical joins across attacking, defending, distribution, discipline, and goalkeeping datasets.</li>
+                        <li>Comparative ranking of players and teams across multiple performance dimensions.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+<div class="slide">
+            <h2 class="text-4xl font-bold mb-10 text-amber-400">Project Conclusion</h2>
+            <div class="card p-8">
+                <p class="text-emerald-50 text-lg leading-relaxed mb-8">
+                    This project demonstrates how SQL transforms raw football statistics into meaningful performance insights through relational database design and analytical querying. By integrating multiple normalized tables, we successfully evaluated performance across attacking, defensive, and individual dimensions.
+                </p>
+                <div class="grid grid-cols-5 gap-4 mb-8">
+                    <div class="text-center p-4 border border-emerald-700 rounded bg-emerald-900/20"><span class="block text-amber-400 font-bold text-lg">Scalable</span><span class="block text-[0.7rem] text-emerald-300 uppercase">Normalized Data</span></div>
+                    <div class="text-center p-4 border border-emerald-700 rounded bg-emerald-900/20"><span class="block text-amber-400 font-bold text-lg">Insightful</span><span class="block text-[0.7rem] text-emerald-300 uppercase">Advanced Metrics</span></div>
+                    <div class="text-center p-4 border border-emerald-700 rounded bg-emerald-900/20"><span class="block text-amber-400 font-bold text-lg">Actionable</span><span class="block text-[0.7rem] text-emerald-300 uppercase">Data-Driven</span></div>
+                    <div class="text-center p-4 border border-emerald-700 rounded bg-emerald-900/20"><span class="block text-amber-400 font-bold text-lg">Holistic</span><span class="block text-[0.7rem] text-emerald-300 uppercase">Multi-Table</span></div>
+                    <div class="text-center p-4 border border-emerald-700 rounded bg-emerald-900/20"><span class="block text-amber-400 font-bold text-lg">Precise</span><span class="block text-[0.7rem] text-emerald-300 uppercase">SQL Logic</span></div>
+                </div>
+                <p class="text-emerald-100 text-sm italic text-center">
+                    "The analysis confirms that successful teams combine efficient finishing, strong defensive structure, and disciplined tactical play, proving the utility of relational data in modern sports analytics."
+                </p>
+            </div>
+        </div>
+
+        <!-- SLIDE 14: THANK YOU -->
+        <div class="slide items-center justify-center text-center">
+            <h1 class="text-6xl font-bold mb-6">Thank You</h1>
+            <p class="text-xl text-emerald-100 mb-12">2026 FIFA World Cup Performance Analytics — SQL-Based Analysis of Team and Player Performance Using a Normalized MySQL Database</p>
+            <div class="card p-8 w-full max-w-2xl text-left">
+                <h3 class="text-amber-400 font-bold uppercase text-xs mb-4 tracking-widest">Project Focus</h3>
+                <div class="grid grid-cols-2 gap-4 text-sm text-emerald-50">
+                    <p>• Designed a normalized relational database (3NF)</p>
+                    <p>• Built ETL pipelines for structured data</p>
+                    <p>• Performed SQL-based analytical queries</p>
+                    <p>• Generated performance insights for teams and players</p>
+                </div>
+            </div>
+            <div class="absolute bottom-10 right-10 text-right">
+                <p class="text-xs text-emerald-300">By</p>
+                <p class="font-bold text-lg">Srayani Ghosh</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
