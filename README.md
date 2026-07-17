@@ -2,7 +2,7 @@
 
 Excited to share my latest end-to-end data analytics project—an interactive SQL analytics portfolio built using the latest available FIFA World Cup 2026 statistics (updated through 17 July 2026).
 𝗔 𝗽𝗿𝗲𝘃𝗶𝗲𝘄 𝗼𝗳 𝘁𝗵𝗲 𝗳𝗶𝗿𝘀𝘁 𝘀𝗶𝘅 𝘀𝗹𝗶𝗱𝗲𝘀 𝗶𝘀 𝗶𝗻𝗰𝗹𝘂𝗱𝗲𝗱 𝗯𝗲𝗹𝗼𝘄. 𝗖𝗹𝗶𝗰𝗸 𝘁𝗵𝗲 𝗽𝗼𝗿𝘁𝗳𝗼𝗹𝗶𝗼 𝗹𝗶𝗻𝗸 𝘁𝗼 𝗲𝘅𝗽𝗹𝗼𝗿𝗲 𝘁𝗵𝗲 𝗰𝗼𝗺𝗽𝗹𝗲𝘁𝗲 𝗮𝗻𝗮𝗹𝘆𝘀𝗶𝘀.
-🔗 Portfolio Link: (https://srayanighosh.github.io/FIFA_Analytics_2026/
+🔗 Portfolio Link: https://srayanighosh.github.io/FIFA_Analytics_2026/
 📂 GitHub Repository (contains all project files, SQL scripts, ETL notebooks, database schema, HTML presentation, and supporting assets): https://github.com/SrayaniGhosh/FIFA_Analytics_2026
 
 
