@@ -1,6 +1,8 @@
 ⚽ FIFA World Cup 2026 SQL Analytics Portfolio 🏆
 
-Excited to share my latest end-to-end data analytics project—an interactive SQL analytics portfolio built using the latest available FIFA World Cup 2026 statistics (updated through 17 July 2026).
+Excited to share my latest end-to-end data analytics project—an interactive SQL analytics portfolio built using the latest available FIFA World Cup 2026 statistics.
+
+Note: Analysis uses official FIFA data available up to 16 July 2026.
 
 𝗔 𝗽𝗿𝗲𝘃𝗶𝗲𝘄 𝗼𝗳 𝘁𝗵𝗲 𝗳𝗶𝗿𝘀𝘁 𝘀𝗶𝘅 𝘀𝗹𝗶𝗱𝗲𝘀 𝗶𝘀 𝗶𝗻𝗰𝗹𝘂𝗱𝗲𝗱 𝗯𝗲𝗹𝗼𝘄. 𝗖𝗹𝗶𝗰𝗸 𝘁𝗵𝗲 𝗽𝗼𝗿𝘁𝗳𝗼𝗹𝗶𝗼 𝗹𝗶𝗻𝗸 𝘁𝗼 𝗲𝘅𝗽𝗹𝗼𝗿𝗲 𝘁𝗵𝗲 𝗰𝗼𝗺𝗽𝗹𝗲𝘁𝗲 𝗮𝗻𝗮𝗹𝘆𝘀𝗶𝘀.
 
